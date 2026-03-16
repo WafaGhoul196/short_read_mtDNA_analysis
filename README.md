@@ -144,7 +144,7 @@ Here are the databases used for annotation:
 | `HelixMTdb_20200327.tsv` | [HelixMTdb](https://helix.com/pages/mitochondrial-variant-database) |
 | `MitImpact-db-3.1.3.txt` | [MitImpact](https://mitimpact.mcb2lab.org/) |
 | `MutationsRNA MITOMAP Foswiki.csv` | [MITOMAP](https://www.mitomap.org/MITOMAP) |
-| `t_APOGEE_2024.0.1.txt` | [t-APOGEE](https://mitobreak.laboratorioghini.it/tAPOGEE) | !!
+| `t_APOGEE_2024.0.1.txt` | [t-APOGEE](https://mitimpact.mcb2lab.org/) |
 
 These databases have been homogenized using this code: Filter_data_bases.R (this code and the orignal databases are found in the `raw_databases/` folder in `annotation_databases/`, the databases obtained after using the code are found in the raw_databases)
 
