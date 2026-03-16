@@ -1,0 +1,26 @@
+name: mtdna_pipeline
+channels:
+  - conda-forge   # must be first — has the most up-to-date builds
+  - bioconda
+  - defaults
+
+dependencies:
+  # ── Python ────────────────────────────────────────────────────────────────
+  - python=3.11        # pin to a specific minor version avoids ABI conflicts
+  - pandas>=1.5
+
+  # ── Bioinformatics tools ──────────────────────────────────────────────────
+  - samtools           # no version pin — bioconda/conda-forge picks compatible build
+  - bwa
+
+  # ── R + packages ─────────────────────────────────────────────────────────
+  # r-base is pulled in automatically as a dependency of the packages below
+  - r-base
+  - r-dplyr
+  - r-tidyr
+  - r-ggplot2
+
+  # ── Note: Haplogrep3 must be installed separately (not on conda) ──────────
+  # Download the binary from: https://github.com/genepi/haplogrep3/releases
+  # Then move it to somewhere on your PATH, e.g.:
+  #   sudo mv haplogrep3 /usr/local/bin/

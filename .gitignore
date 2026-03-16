@@ -1,0 +1,36 @@
+# Large data files
+*.bam
+*.bai
+*.sam
+*.fq.gz
+*.fastq.gz
+*.txt
+*.log
+
+# Reference genome (download separately)
+reference/*.fasta
+reference/*.fa
+reference/*.bwt
+reference/*.pac
+reference/*.ann
+reference/*.amb
+reference/*.sa
+reference/*.fai
+
+# Annotation databases (download separately)
+annotation_databases/*.csv
+
+# Results
+results/
+fastq/
+haplogrep/
+annotation/
+mtdna_results/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# R
+.Rhistory
