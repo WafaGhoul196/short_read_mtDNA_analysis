@@ -1,6 +1,7 @@
 # Mitochondrial DNA Analysis Pipeline
 
 A reproducible end-to-end pipeline for mitochondrial DNA variant calling, heteroplasmy calculation, haplogroup classification, and functional annotation from whole-genome short read sequencing data (tested on illumina data).
+This pipeline takes BAM files as input, extract mitochondrial reads and realign them again into the reference genome of interest (the revised cambridge reference sequence is used here).
 
 ---
 
@@ -9,29 +10,29 @@ A reproducible end-to-end pipeline for mitochondrial DNA variant calling, hetero
 ```
  BAM files
      │
-        ▼
+     ▼
 [1] Extract chrM BAM                (samtools)
      │
-        ▼
+     ▼
 [2] BAM → FASTQ                     (samtools)
      │
-        ▼
+     ▼
 [3] Align to rCRS + Pileup          (bwa mem + samtools mpileup + pileup_analysis.py)
      │                               ↳ heteroplasmy calculated here directly
-        ▼
+     ▼
 [4] Quality Filtering                (pileup_filter.R)
      │
-        ▼
+     ▼
 [5] Haplogroup Classification       (csv_to_vcf.py + Haplogrep3)
      │
-        ▼
+     ▼
 [6] Remove Haplogroup-Defining      (filter_haplo_variants.py)
     Variants
      │
-        ▼
+     ▼
 [7] Functional Annotation           (apply_annotation.py)
      │
-        ▼
+     ▼
 merged_annotated.csv
 ```
 
@@ -80,8 +81,8 @@ mtDNA_pipeline/
 
 ```bash
 # Clone the repository
-git clone (add link)
-cd mtdna-pipeline
+git clone https://github.com/WafaGhoul196/short_read_mtDNA_anlysis.git
+cd short_read_mtDNA_anlysis
 
 # Create and activate the environment
 bash setup.sh
@@ -89,7 +90,7 @@ conda activate mtdna_pipeline
 ```
 
 #### Option B — Manually
-# if problems with downloading haplogrep do it manually
+if problems with downloading haplogrep do it manually
 **Haplogrep3:**
 ```bash
 # Download the latest release
@@ -123,16 +124,12 @@ The pipeline aligns against the **revised Cambridge Reference Sequence (rCRS)** 
 
 ## Sample CSV Format
 
+This file contains the sample IDs
 The input CSV must have **Sequencing_number** in **column 6** (1-based), with a header row.
 
 ```
 ID,Name,Date,Project,Status,Sequencing_number,...
 
-```
-
-The pipeline expects the following BAM file structure on the sequencer output:
-```
-<BASE_DIR>/<Sequencing_number>/dragen/<Sequencing_number>.bam
 ```
 
 ---
@@ -149,9 +146,9 @@ Here are the databases used for annotation:
 | `MutationsRNA MITOMAP Foswiki.csv` | [MITOMAP](https://www.mitomap.org/MITOMAP) |
 | `t_APOGEE_2024.0.1.txt` | [t-APOGEE](https://mitobreak.laboratorioghini.it/tAPOGEE) | !!
 
-These databases have been homogenized using this code: Filter_data_bases.R
+These databases have been homogenized using this code: Filter_data_bases.R (this code and the orignal databases are found in the `raw_databases/` folder in `annotation_databases/`, the databases obtained after using the code are found in the raw_databases)
 
-Place the following files in the `annotation_databases/` folder:
+You can annotate with other databases of interest. Just update the annotation code.
 Each database file should contain at least a **Pos** column, and where relevant **Ref** and **Alt** columns for allele-specific annotation.
 
 ---
@@ -230,7 +227,7 @@ bash run_pipeline.sh -c samples.csv -o results/ -s haplogrep,haplo_filter,annota
 
 ## Heteroplasmy Formula
 
-The corrected formula (implemented in `scripts/recalculate_heteroplasmy.py`):
+The formula is implimanted in `scripts/recalculate_heteroplasmy.py`:
 
 ```
 Heteroplasmy = (A + T + G + C + ins + del − RefBase_count)
@@ -238,6 +235,6 @@ Heteroplasmy = (A + T + G + C + ins + del − RefBase_count)
                       A + T + G + C + ins + del
 ```
 
-This excludes unmapped/ambiguous reads from both numerator and denominator, giving the fraction of non-reference bases among all confidently called bases at each position.
+Note: only the first three major insertions and deletions are taken in account.
 
-
+Thank you, Wafa :) 
