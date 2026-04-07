@@ -354,7 +354,7 @@ step_annotate() {
   log "━━━ STEP 7: Annotation ━━━"
   python3 "$SCRIPT_DIR/scripts/apply_annotation.py" \
     --input_dir  "$HAPLO_FILTER_DIR" \
-    --annot_dir  "$SCRIPT_DIR/annotation_databases" \
+    --annot_dir  "$SCRIPT_DIR/annotation_databases" \  # either curated or raw folder depending on user choice
     --output     "$ANNOT_DIR/merged_annotated.csv" \
     2>>"$LOG_FILE"
   ok "Annotation complete → $ANNOT_DIR/merged_annotated.csv"
