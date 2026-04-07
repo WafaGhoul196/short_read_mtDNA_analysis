@@ -53,12 +53,16 @@ mtDNA_pipeline/
 │   └── apply_annotation.py         # Merge annotation databases
 ├── reference/
 │   └── rCRS.fasta                   # Place reference genome here (see below)
-└── annotation_databases/            # Place annotation DB CSVs here (see below)
-    ├── gnomAD_filtred.csv
-    ├── HelixMTdb_modified.csv
-    ├── MitImpact-db-3.1.3_modified.csv
-    ├── MitoMAP_RNA_tRNA.csv
-    └── t_APOGEE_data_modified.csv
+└── annotation_databases/
+├── curated/ # examples of .csv annotation files 
+│ ├── gnomAD_filtred.csv
+│ ├── HelixMTdb_modified.csv
+│ ├── MitImpact-db-3.1.3_modified.csv
+│ ├── MitoMAP_RNA_tRNA.csv
+│ ├── t_APOGEE_data_modified.csv
+│ └── Filtre_data_bases.R
+├── raw/ # if you want to use other databases, place them here
+└── README.md # Description of annotation sources
 ```
 
 ---
