@@ -54,14 +54,14 @@ mtDNA_pipeline/
 ├── reference/
 │   └── rCRS.fasta                   # Place reference genome here (see below)
 └── annotation_databases/
-├── curated/ # examples of .csv annotation files 
+├── curated/ # examples of .csv annotation files you can use (have been generated using Filtre_data_bases.R) 
 │ ├── gnomAD_filtred.csv
 │ ├── HelixMTdb_modified.csv
 │ ├── MitImpact-db-3.1.3_modified.csv
 │ ├── MitoMAP_RNA_tRNA.csv
 │ ├── t_APOGEE_data_modified.csv
 │ └── Filtre_data_bases.R
-├── raw/ # if you want to use other databases, place them here
+├── raw # if you want to use other databases, place them here
 └── README.md # Description of annotation sources
 ```
 
