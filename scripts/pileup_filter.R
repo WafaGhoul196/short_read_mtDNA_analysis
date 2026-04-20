@@ -10,10 +10,17 @@ suppressPackageStartupMessages({
   library(ggplot2)
 })
 
-# ── Parse argument ────────────────────────────────────────────────────────────
+# ── Parse arguments ────────────────────────────────────────────────────────────
 args <- commandArgs(trailingOnly = TRUE)
-results_dir <- if (length(args) >= 1) args[1] else "."
-cat(sprintf("Working directory: %s\n", results_dir))
+results_dir  <- if (length(args) >= 1) args[1] else "."
+min_het      <- if (length(args) >= 2) as.numeric(args[2]) else 0.05
+min_af       <- if (length(args) >= 3) as.numeric(args[3]) else 0.05
+af_strict    <- if (length(args) >= 4) as.numeric(args[4]) else 0.08
+max_unmapped <- if (length(args) >= 5) as.numeric(args[5]) else 0.7
+
+cat(sprintf("Working directory : %s\n", results_dir))
+cat(sprintf("Filter thresholds : Heteroplasmy > %.3f & AF > %.3f | AF > %.3f | unmapped/Depth < %.2f\n",
+            min_het, min_af, af_strict, max_unmapped))
 
 # ── Variant transformation function ──────────────────────────────────────────
 transform_to_csv_format <- function(df) {
@@ -125,8 +132,8 @@ for (file in pileup_files) {
   data_final    <- transform_to_csv_format(data)
 
   data_filtered <- subset(data_final,
-    ((Heteroplasmy > 0.05 & AF > 0.05) | AF > 0.08) &
-    (unmapped / Depth < 0.7))
+    ((Heteroplasmy > min_het & AF > min_af) | AF > af_strict) &
+    (unmapped / Depth < max_unmapped))
 
   cat(sprintf("  Positions after filtering       : %d\n", nrow(data_filtered)))
 
