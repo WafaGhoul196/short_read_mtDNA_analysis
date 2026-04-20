@@ -36,10 +36,18 @@ ${BOLD}Options:${NC}
   -s  Steps to run (comma-separated):
         all | extract | fastq | pileup | filter | haplogrep | haplo_filter | annotate
       [default: all]
+  -n  Run annotation step (true/false)          [default: true]
+
+${BOLD}Filtering thresholds (Step 4):${NC}
+  -m  Minimum heteroplasmy                      [default: 0.05]
+  -a  Minimum allele frequency (AF)             [default: 0.05]
+  -A  Minimum AF (strict, no heteroplasmy req.) [default: 0.08]
+  -u  Maximum unmapped/Depth ratio              [default: 0.7]
   -h  Show this help
 
 ${BOLD}Example:${NC}
   $0 -c data_filtered.csv -o results/ -t 16
+  $0 -c data_filtered.csv -o results/ -m 0.03 -a 0.03 -A 0.05 -u 0.5 -n false
 
 ${BOLD}Dependencies:${NC}
   samtools, bwa, python3 (pandas), R (dplyr, tidyr, ggplot2), haplogrep3
@@ -55,9 +63,16 @@ HAPLOGREP_BIN="haplogrep3"
 THREADS=8
 STEPS="all"
 CSV_FILE=""
+# Filtering thresholds (passed to pileup_filter.R)
+MIN_HET=0.05
+MIN_AF=0.05
+AF_STRICT=0.08
+MAX_UNMAPPED=0.7
+# Annotation toggle
+ANNOTATE="true"
 
 # ── Parse arguments ───────────────────────────────────────────────────────────
-while getopts "c:b:o:r:H:t:s:h" opt; do
+while getopts "c:b:o:r:H:t:s:m:a:A:u:n:h" opt; do
   case $opt in
     c) CSV_FILE="$OPTARG" ;;
     b) BASE_DIR="$OPTARG" ;;
@@ -66,6 +81,11 @@ while getopts "c:b:o:r:H:t:s:h" opt; do
     H) HAPLOGREP_BIN="$OPTARG" ;;
     t) THREADS="$OPTARG" ;;
     s) STEPS="$OPTARG" ;;
+    m) MIN_HET="$OPTARG" ;;
+    a) MIN_AF="$OPTARG" ;;
+    A) AF_STRICT="$OPTARG" ;;
+    u) MAX_UNMAPPED="$OPTARG" ;;
+    n) ANNOTATE="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -97,6 +117,8 @@ log "Output     : $OUTPUT_DIR"
 log "Reference  : $REF_GENOME"
 log "Threads    : $THREADS"
 log "Steps      : $STEPS"
+log "Annotate   : $ANNOTATE"
+log "Filter     : Heteroplasmy > $MIN_HET & AF > $MIN_AF | AF > $AF_STRICT | unmapped/Depth < $MAX_UNMAPPED"
 
 # ── Dependency check ──────────────────────────────────────────────────────────
 check_deps() {
@@ -264,7 +286,9 @@ step_pileup() {
 # =============================================================================
 step_filter() {
   log "━━━ STEP 4: Filter Variants (R) ━━━"
-  Rscript "$SCRIPT_DIR/scripts/pileup_filter.R" "$RESULTS_DIR" 2>>"$LOG_FILE"
+  Rscript "$SCRIPT_DIR/scripts/pileup_filter.R" \
+    "$RESULTS_DIR" "$MIN_HET" "$MIN_AF" "$AF_STRICT" "$MAX_UNMAPPED" \
+    2>>"$LOG_FILE"
   ok "Variant filtering complete."
 }
 
@@ -352,9 +376,13 @@ step_haplo_filter() {
 # =============================================================================
 step_annotate() {
   log "━━━ STEP 7: Annotation ━━━"
+  if [[ "$ANNOTATE" != "true" ]]; then
+    warn "Annotation skipped (--annotate false)."
+    return
+  fi
   python3 "$SCRIPT_DIR/scripts/apply_annotation.py" \
     --input_dir  "$HAPLO_FILTER_DIR" \
-    --annot_dir  "$SCRIPT_DIR/annotation_databases/curated" \  # either curated or raw folder depending on user choice
+    --annot_dir  "$SCRIPT_DIR/annotation_databases/curated" \
     --output     "$ANNOT_DIR/merged_annotated.csv" \
     2>>"$LOG_FILE"
   ok "Annotation complete → $ANNOT_DIR/merged_annotated.csv"
