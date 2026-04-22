@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #  Mitochondrial DNA Analysis Pipeline
-#  Full pipeline: BAM extraction → FASTQ → Alignment & Pileup →
+#  Full pipeline: BAM extraction → FASTQ → Alignment & Variant Calling →
 #                 Variant Filtering → Haplogroup Classification →
 #                 Haplogroup Variant Removal → Annotation
 # =============================================================================
@@ -56,6 +56,7 @@ EOF
 }
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
+LOG_FILE="/dev/stderr"
 BASE_DIR="/mnt/DRAGEN_pipeline_results/wgs"
 OUTPUT_DIR="./mtdna_results"
 REF_GENOME="./reference/rCRS.fasta"
@@ -100,7 +101,7 @@ RESULTS_DIR="$OUTPUT_DIR/results"
 HAPLO_DIR="$OUTPUT_DIR/haplogrep"
 HAPLO_FILTER_DIR="$OUTPUT_DIR/haplogroup_filtered"
 ANNOT_DIR="$OUTPUT_DIR/annotation"
-LOG_FILE="$OUTPUT_DIR/pipeline.log"
+LOG_FILE="$OUTPUT_DIR/pipeline.log"   # real path — overwrites the /dev/stderr bootstrap above
 
 mkdir -p "$OUTPUT_DIR" "$FASTQ_DIR" "$RESULTS_DIR" "$HAPLO_DIR" "$HAPLO_FILTER_DIR" "$ANNOT_DIR"
 
