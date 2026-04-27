@@ -47,7 +47,7 @@ mtDNA_pipeline/
 ├── environment.yml                  # Conda environment (Python + R)
 ├── scripts/
 │   ├── pileup_analysis.py           # Parse samtools mpileup + calculate heteroplasmy → CSV output
-│   ├── pileup_filter.R              # Quality filtering (you can change the parameters: ((Heteroplasmy > 0.05 & AF > 0.05) | AF > 0.08) &  (unmapped / Depth < 0.7)) + plots
+│   ├── pileup_filter.R              # Quality filtering  + plots
 │   ├── csv_to_vcf.py                # Convert filtered CSV → VCF for Haplogrep
 │   ├── filter_haplo_variants.py     # Remove haplogroup-defining variants 
 │   └── apply_annotation.py         # Merge annotation databases
@@ -159,15 +159,28 @@ Each database file should contain at least a **Pos** column, and where relevant 
 
 ## Usage
 
-### Full pipeline (all steps)
-
+### Run full pipeline (Default parametres)
 ```bash
-bash run_pipeline.sh \
-  -c data_filtered.csv \
-  -b /path/to/DRAGEN_results \
+  bash run_pipeline.sh \
+  -c samples.csv \  
+  -b /path/to/bam_folder \
   -o /path/to/output \
-  -r reference/rCRS.fasta \
-  -t 16
+  -r path/to/rCRS.fasta \
+  -t 16 \
+```
+### Run Pipeline with custom parametres
+```bash
+  bash run_pipeline.sh \
+  -c samples.csv \  
+  -b /path/to/bam_folder \
+  -o /path/to/output \
+  -r path/to/rCRS.fasta \
+  -t 16 \
+  -m 0.03 \  
+  -a 0.03  \ 
+  -A 0.05  \ 
+  -u 0.5 \
+  -n false   
 ```
 
 ### Run specific steps only
@@ -176,10 +189,10 @@ Steps are: `extract`, `fastq`, `pileup`, `filter`, `haplogrep`, `haplo_filter`, 
 
 ```bash
 # Re-run only haplogroup filtering and annotation
-bash run_pipeline.sh -c samples.csv -o results/ -s haplo_filter,annotate
-
-# Re-run from haplogrep onward
-bash run_pipeline.sh -c samples.csv -o results/ -s haplogrep,haplo_filter,annotate
+bash run_pipeline.sh 
+-c samples.csv  \
+-o results \
+-s haplo_filter,annotate
 ```
 
 ### All options
@@ -193,6 +206,19 @@ bash run_pipeline.sh -c samples.csv -o results/ -s haplogrep,haplo_filter,annota
 -t  CPU threads                    [default: 8]
 -s  Steps to run (comma-separated or 'all')
 -h  Show help
+-m  heteroplasmy threshold
+-a allele frequency threshold (with heteroplasmy)
+-A strict allele frequency threshold
+-u unmapped/depth ratio thre
+```
+
+### Filtering treshold
+The filtering parametres by default: (Heteroplasmy > 0.05 & AF > 0.05) | AF > 0.08 &  (unmapped / Depth < 0.7)
+```
+-m	0.05	Minimum heteroplasmy
+-a	0.05	Minimum allele frequency
+-A	0.08	Strict AF threshold (independent of heteroplasmy)
+-u	0.7	Max unmapped/depth ratio (here missing allele < 0.3)
 ```
 
 ---
@@ -240,5 +266,13 @@ Heteroplasmy = (A + T + G + C + ins + del − RefBase_count)
 ```
 
 Note: only the first three major insertions and deletions are taken in account.
+
+## Annotation
+You can add your own databases in:
+```
+annotation_databases/raw/
+```
+This pipelines performs the annotation on: _no_haplo_variants.csv  (the table of variants without haplogroup-defining ones). If you wantto apply the annotation on the table with all variants, modify the apply_annotation.py : change the path from _no_haplo_variants.csv to _haplo_variants.csv
+
 
 Thank you, Wafa :) 
